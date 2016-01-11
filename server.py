@@ -28,11 +28,28 @@ import SocketServer
 
 
 class MyWebServer(SocketServer.BaseRequestHandler):
+
+    def getRequest(self,dataStr):
+        temp = ""
+        for char in dataStr:
+            if char == "\n":
+                break
+            temp += char
+        return temp 
     
     def handle(self):
         self.data = self.request.recv(1024).strip()
         print ("Got a request of: %s\n" % self.data)
-        self.request.sendall("OK")
+        httpHeader200 = "HTTP/1.1 200"
+        httpHeader404 = "HTTP/1.1 404"
+        getrequest  = str(self.getRequest(self.data)).split()
+        pagerequest = getrequest[1]
+        if pagerequest not in ["/","/index.html","/base.css","/deep/deep.css","/deep/index.html" ]:
+            self.request.sendall(httpHeader404)
+            return
+        myfile = open("www/index.html", 'r')
+        self.request.sendall(httpHeader200 + " \nContent-Type: text/css\r\n\r\n" + myfile.read() )
+        #self.request.sendall("OK")
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
