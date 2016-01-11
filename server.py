@@ -44,11 +44,20 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         httpHeader404 = "HTTP/1.1 404"
         getrequest  = str(self.getRequest(self.data)).split()
         pagerequest = getrequest[1]
-        if pagerequest not in ["/","/index.html","/base.css","/deep/deep.css","/deep/index.html" ]:
+        if pagerequest not in ["/","/index.html","/base.css","/deep/deep.css","/deep/index.html","/deep/" ]:
             self.request.sendall(httpHeader404)
             return
-        myfile = open("www/index.html", 'r')
-        self.request.sendall(httpHeader200 + " \nContent-Type: text/css\r\n\r\n" + myfile.read() )
+        if pagerequest in ["/","/index.html"]:
+            myfile = open("www/index.html", 'r')
+        else:
+            if pagerequest in ["/deep/"]:
+                myfile = open("www/deep/index.html",'r')
+            else:
+                myfile = open("www"+pagerequest,'r')
+        if pagerequest.split(".")[-1] == "css":
+            self.request.sendall("HTTP/1.1 200 \nContent-Type: text/css \r\n\r\n" + myfile.read() )
+        else:
+            self.request.sendall("HTTP/1.1 200 \nContent-Type: text/html \r\n\r\n" + myfile.read() )
         #self.request.sendall("OK")
 
 if __name__ == "__main__":
