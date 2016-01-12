@@ -40,24 +40,26 @@ class MyWebServer(SocketServer.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024).strip()
         print ("Got a request of: %s\n" % self.data)
-        httpHeader200 = "HTTP/1.1 200"
-        httpHeader404 = "HTTP/1.1 404"
         getrequest  = str(self.getRequest(self.data)).split()
         pagerequest = getrequest[1]
-        if pagerequest not in ["/","/index.html","/base.css","/deep/deep.css","/deep/index.html","/deep/" ]:
-            self.request.sendall(httpHeader404)
+        if pagerequest not in ["/","/index.html","/base.css","/deep/deep.css","/deep/index.html","/deep/","/deep" ]:
+            self.request.sendall("HTTP/1.1 404 Not Found\r\n\r\n")
             return
         if pagerequest in ["/","/index.html"]:
             myfile = open("www/index.html", 'r')
         else:
-            if pagerequest in ["/deep/"]:
+            if pagerequest in ["/deep/","/deep/index.html"]:
                 myfile = open("www/deep/index.html",'r')
             else:
+                if pagerequest in ["/deep"]:
+	    		    myfile = open("www/deep/index.html",'r')
+		    	    self.request.sendall("HTTP/1.1 302 Found \nLocation: deep/index.html\r\n\r\n")
+		    	    return 
                 myfile = open("www"+pagerequest,'r')
         if pagerequest.split(".")[-1] == "css":
-            self.request.sendall("HTTP/1.1 200 \nContent-Type: text/css \r\n\r\n" + myfile.read() )
+            self.request.sendall("HTTP/1.1 200 OK\nContent-Type: text/css \r\n\r\n" + myfile.read() )
         else:
-            self.request.sendall("HTTP/1.1 200 \nContent-Type: text/html \r\n\r\n" + myfile.read() )
+            self.request.sendall("HTTP/1.1 200 OK\nContent-Type: text/html \r\n\r\n" + myfile.read() )
         #self.request.sendall("OK")
 
 if __name__ == "__main__":
