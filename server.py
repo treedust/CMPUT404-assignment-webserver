@@ -53,7 +53,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             else:
                 if pagerequest in ["/deep"]:
 	    		    myfile = open("www/deep/index.html",'r')
-		    	    self.request.sendall("HTTP/1.1 302 Found \nLocation: deep/index.html\r\n\r\n")
+		    	    self.request.sendall("HTTP/1.1 302 Found \nLocation: deep/\r\n\r\n")
 		    	    return 
                 myfile = open("www"+pagerequest,'r')
         if pagerequest.split(".")[-1] == "css":
